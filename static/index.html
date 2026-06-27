@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Midtrans Payment Tester</title>
+        <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key=""></script>
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: "Segoe UI", sans-serif;
+                background: #0f172a;
+                color: #e2e8f0;
+                min-height: 100vh;
+            }
+            header {
+                background: linear-gradient(135deg, #1e3a5f, #0f2d47);
+                padding: 24px 32px;
+                border-bottom: 1px solid #1e3a5f;
+            }
+            header h1 {
+                font-size: 1.5rem;
+                color: #38bdf8;
+                font-weight: 700;
+            }
+            header p {
+                font-size: 0.85rem;
+                color: #64748b;
+                margin-top: 4px;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 24px 16px;
+                display: grid;
+                grid-template-columns: 360px 1fr;
+                gap: 24px;
+            }
+            @media (max-width: 900px) {
+                .container {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Form Panel */
+            .form-panel {
+                background: #1e293b;
+                border-radius: 12px;
+                padding: 24px;
+                border: 1px solid #334155;
+                height: fit-content;
+            }
+            .form-panel h2 {
+                font-size: 1rem;
+                color: #94a3b8;
+                font-weight: 600;
+                margin-bottom: 16px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            .field {
+                margin-bottom: 14px;
+            }
+            label {
+                display: block;
+                font-size: 0.8rem;
+                color: #64748b;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+            input,
+            select {
+                width: 100%;
+                padding: 9px 12px;
+                background: #0f172a;
+                border: 1px solid #334155;
+                border-radius: 8px;
+                color: #e2e8f0;
+                font-size: 0.9rem;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+            input:focus,
+            select:focus {
+                border-color: #38bdf8;
+            }
+            input::placeholder {
+                color: #475569;
+            }
+            .cc-extra {
+                display: none;
+                background: #0f172a;
+                border: 1px solid #1e3a5f;
+                border-radius: 8px;
+                padding: 12px;
+                margin-top: 8px;
+            }
+            .cc-extra.show {
+                display: block;
+            }
+
+            /* Method Tabs */
+            .right-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .section {
+                background: #1e293b;
+                border-radius: 12px;
+                border: 1px solid #334155;
+                overflow: hidden;
+            }
+            .section-header {
+                padding: 14px 20px;
+                background: #162032;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-bottom: 1px solid #334155;
+            }
+            .section-header .icon {
+                font-size: 1.2rem;
+            }
+            .section-header h3 {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: #cbd5e1;
+            }
+            .section-header .badge {
+                margin-left: auto;
+                font-size: 0.7rem;
+                padding: 2px 8px;
+                border-radius: 99px;
+                background: #0f2d47;
+                color: #38bdf8;
+                border: 1px solid #1e4a6f;
+            }
+            .btn-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 10px;
+                padding: 16px;
+            }
+            .pay-btn {
+                padding: 10px 14px;
+                border: 1px solid #334155;
+                border-radius: 8px;
+                background: #0f172a;
+                color: #cbd5e1;
+                font-size: 0.85rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                white-space: nowrap;
+            }
+            .pay-btn:hover {
+                border-color: #38bdf8;
+                color: #38bdf8;
+                background: #0f2d47;
+                transform: translateY(-1px);
+            }
+            .pay-btn:active {
+                transform: translateY(0);
+            }
+            .pay-btn .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+            .snap-btn {
+                background: linear-gradient(135deg, #1e3a5f, #0f2d47);
+                border-color: #38bdf8;
+                color: #38bdf8;
+                font-size: 0.9rem;
+                font-weight: 600;
+                grid-column: 1/-1;
+                justify-content: center;
+                padding: 14px;
+            }
+            .snap-btn:hover {
+                background: linear-gradient(135deg, #0f2d47, #0a1f36);
+            }
+
+            /* Response Panel */
+            .response-panel {
+                background: #0f172a;
+                border-radius: 10px;
+                border: 1px solid #1e3a5f;
+                padding: 14px;
+                margin: 0 16px 16px;
+            }
+            .response-panel h4 {
+                font-size: 0.75rem;
+                color: #64748b;
+                margin-bottom: 8px;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .response-panel pre {
+                font-size: 0.78rem;
+                color: #94a3b8;
+                overflow-x: auto;
+                white-space: pre-wrap;
+                max-height: 220px;
+                overflow-y: auto;
+                line-height: 1.6;
+            }
+            .status-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: #64748b;
+            }
+            .status-dot.ok {
+                background: #22c55e;
+            }
+            .status-dot.err {
+                background: #ef4444;
+            }
+            .status-dot.loading {
+                background: #f59e0b;
+                animation: pulse 0.8s infinite;
+            }
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.3;
+                }
+            }
+
+            /* Toast */
+            #toast {
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                background: #1e293b;
+                border: 1px solid #334155;
+                border-radius: 10px;
+                padding: 12px 18px;
+                font-size: 0.85rem;
+                color: #cbd5e1;
+                opacity: 0;
+                transition: opacity 0.3s;
+                pointer-events: none;
+                z-index: 999;
+                max-width: 320px;
+            }
+            #toast.show {
+                opacity: 1;
+            }
+            #toast.success {
+                border-color: #22c55e;
+                color: #22c55e;
+            }
+            #toast.error {
+                border-color: #ef4444;
+                color: #ef4444;
+            }
+
+            .snap-note {
+                font-size: 0.75rem;
+                color: #475569;
+                padding: 0 16px 12px;
+            }
+            select option {
+                background: #1e293b;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>🔧 Midtrans Payment Tester</h1>
+            <p>Sandbox testing tool — all payment methods (Core API + Snap)</p>
+        </header>
+
+        <div class="container">
+            <!-- LEFT: Customer & Amount Form -->
+            <div class="form-panel">
+                <h2>📋 Detail Transaksi</h2>
+                <div class="field">
+                    <label>Order ID (kosongkan = auto-generate)</label>
+                    <input id="order_id" placeholder="ORDER-xxxx" />
+                </div>
+                <div class="field">
+                    <label>Amount (IDR) *</label>
+                    <input id="amount" type="number" value="10000" min="1000" />
+                </div>
+                <div class="field">
+                    <label>First Name</label>
+                    <input id="first_name" value="Test" />
+                </div>
+                <div class="field">
+                    <label>Last Name</label>
+                    <input id="last_name" value="User" />
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input id="email" value="test@example.com" />
+                </div>
+                <div class="field">
+                    <label>Phone</label>
+                    <input id="phone" value="08123456789" />
+                </div>
+                <div class="field">
+                    <label>Nama Produk</label>
+                    <input id="product_name" value="Test Product" />
+                </div>
+
+                <div class="cc-extra" id="cc-extra">
+                    <div class="field">
+                        <label>Token ID (dari Midtrans.js) *</label>
+                        <input id="token_id" placeholder="Dari midtrans.js card tokenization" />
+                    </div>
+                    <div class="field">
+                        <label>Bank Issuer (untuk installment)</label>
+                        <select id="bank">
+                            <option value="bca">BCA</option>
+                            <option value="bni">BNI</option>
+                            <option value="mandiri">Mandiri</option>
+                            <option value="bri">BRI</option>
+                            <option value="cimb">CIMB</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Installment Term (0 = full payment)</label>
+                        <select id="installment_term">
+                            <option value="0">Full Payment</option>
+                            <option value="3">3 Bulan</option>
+                            <option value="6">6 Bulan</option>
+                            <option value="12">12 Bulan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field" id="ovo-field" style="display: none">
+                    <label>No HP OVO (terdaftar di OVO)</label>
+                    <input id="ovo_phone" placeholder="08xxxxxxxxxx" />
+                </div>
+            </div>
+
+            <!-- RIGHT: Payment Method Buttons -->
+            <div class="right-panel">
+                <!-- Snap (All Methods) -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">⚡</span>
+                        <h3>Snap (All Payment Methods)</h3>
+                        <span class="badge">Recommended</span>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn snap-btn" onclick="callSnap()">
+                            🚀 Open Snap Payment UI
+                        </button>
+                    </div>
+                    <p class="snap-note">
+                        Snap menampilkan semua metode pembayaran dalam satu popup. Midtrans.js akan
+                        dimuat otomatis dari response.
+                    </p>
+                    <div class="response-panel" id="resp-snap">
+                        <h4><span class="status-dot" id="dot-snap"></span>Response</h4>
+                        <pre id="pre-snap">—</pre>
+                    </div>
+                </div>
+
+                <!-- Bank Transfer -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">🏦</span>
+                        <h3>Bank Transfer / Virtual Account</h3>
+                        <span class="badge">6 bank</span>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn" onclick="charge('bank-transfer/bca', 'bca')">
+                            <span class="dot" style="background: #0066ae"></span>BCA VA
+                        </button>
+                        <button class="pay-btn" onclick="charge('bank-transfer/bni', 'bni')">
+                            <span class="dot" style="background: #ff6600"></span>BNI VA
+                        </button>
+                        <button class="pay-btn" onclick="charge('bank-transfer/bri', 'bri')">
+                            <span class="dot" style="background: #00529c"></span>BRI VA
+                        </button>
+                        <button
+                            class="pay-btn"
+                            onclick="charge('bank-transfer/mandiri', 'mandiri')"
+                        >
+                            <span class="dot" style="background: #003d78"></span>Mandiri Bill
+                        </button>
+                        <button
+                            class="pay-btn"
+                            onclick="charge('bank-transfer/permata', 'permata')"
+                        >
+                            <span class="dot" style="background: #8b1a1a"></span>Permata VA
+                        </button>
+                        <button class="pay-btn" onclick="charge('bank-transfer/cimb', 'cimb')">
+                            <span class="dot" style="background: #c8202f"></span>CIMB VA
+                        </button>
+                    </div>
+                    <div class="response-panel" id="resp-bt">
+                        <h4><span class="status-dot" id="dot-bt"></span>Response</h4>
+                        <pre id="pre-bt">—</pre>
+                    </div>
+                </div>
+
+                <!-- E-Wallet -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">📱</span>
+                        <h3>E-Wallet</h3>
+                        <span class="badge">4 dompet</span>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn" onclick="charge('ewallet/gopay', 'gopay')">
+                            <span class="dot" style="background: #00aed6"></span>GoPay
+                        </button>
+                        <button class="pay-btn" onclick="charge('ewallet/shopeepay', 'shopeepay')">
+                            <span class="dot" style="background: #ee4d2d"></span>ShopeePay
+                        </button>
+                        <button class="pay-btn" onclick="charge('ewallet/dana', 'dana')">
+                            <span class="dot" style="background: #118eea"></span>DANA
+                        </button>
+                        <button class="pay-btn" onclick="showOVO()">
+                            <span class="dot" style="background: #4c3494"></span>OVO
+                        </button>
+                    </div>
+                    <div class="response-panel" id="resp-ew">
+                        <h4><span class="status-dot" id="dot-ew"></span>Response</h4>
+                        <pre id="pre-ew">—</pre>
+                    </div>
+                </div>
+
+                <!-- QRIS -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">📷</span>
+                        <h3>QRIS</h3>
+                        <span class="badge">Generic</span>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn" onclick="charge('qris', 'qris')">
+                            <span class="dot" style="background: #e60012"></span>Generate QRIS
+                        </button>
+                    </div>
+                    <div class="response-panel" id="resp-qris">
+                        <h4><span class="status-dot" id="dot-qris"></span>Response</h4>
+                        <pre id="pre-qris">—</pre>
+                    </div>
+                </div>
+
+                <!-- Credit Card -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">💳</span>
+                        <h3>Credit Card</h3>
+                        <span class="badge">3DS</span>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn" onclick="showCC()">
+                            <span class="dot" style="background: #1a56db"></span>Charge Kartu Kredit
+                        </button>
+                    </div>
+                    <p class="snap-note">
+                        Isi Token ID (dari Midtrans.js) di form kiri sebelum charge.
+                    </p>
+                    <div class="response-panel" id="resp-cc">
+                        <h4><span class="status-dot" id="dot-cc"></span>Response</h4>
+                        <pre id="pre-cc">—</pre>
+                    </div>
+                </div>
+
+                <!-- Convenience Store -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">🏪</span>
+                        <h3>Convenience Store</h3>
+                        <span class="badge">2 store</span>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn" onclick="charge('cstore/indomaret', 'indomaret')">
+                            <span class="dot" style="background: #e31e24"></span>Indomaret
+                        </button>
+                        <button class="pay-btn" onclick="charge('cstore/alfamart', 'alfamart')">
+                            <span class="dot" style="background: #ef212a"></span>Alfamart
+                        </button>
+                    </div>
+                    <div class="response-panel" id="resp-cs">
+                        <h4><span class="status-dot" id="dot-cs"></span>Response</h4>
+                        <pre id="pre-cs">—</pre>
+                    </div>
+                </div>
+
+                <!-- Pay Later -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">⏳</span>
+                        <h3>Pay Later / BNPL</h3>
+                        <span class="badge">3 provider</span>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn" onclick="charge('akulaku', 'akulaku')">
+                            <span class="dot" style="background: #1890ff"></span>Akulaku
+                        </button>
+                        <button class="pay-btn" onclick="charge('kredivo', 'kredivo')">
+                            <span class="dot" style="background: #e31837"></span>Kredivo
+                        </button>
+                        <button class="pay-btn" onclick="charge('uob-ezpay', 'uob')">
+                            <span class="dot" style="background: #003087"></span>UOB EzPay
+                        </button>
+                    </div>
+                    <div class="response-panel" id="resp-pl">
+                        <h4><span class="status-dot" id="dot-pl"></span>Response</h4>
+                        <pre id="pre-pl">—</pre>
+                    </div>
+                </div>
+
+                <!-- Transaction Tools -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">🔍</span>
+                        <h3>Transaction Tools</h3>
+                    </div>
+                    <div class="btn-grid">
+                        <button class="pay-btn" onclick="checkStatus()">
+                            <span class="dot" style="background: #22c55e"></span>Cek Status
+                        </button>
+                        <button class="pay-btn" onclick="cancelTx()">
+                            <span class="dot" style="background: #ef4444"></span>Cancel Transaksi
+                        </button>
+                    </div>
+                    <div class="response-panel" id="resp-tool">
+                        <h4><span class="status-dot" id="dot-tool"></span>Response</h4>
+                        <pre id="pre-tool">—</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast"></div>
+
+        <script>
+            // ── Helpers ──────────────────────────────────────────────────────────────────
+
+            function getPayload(extra = {}) {
+                return {
+                    order_id: document.getElementById("order_id").value.trim(),
+                    amount: parseFloat(document.getElementById("amount").value) || 10000,
+                    first_name: document.getElementById("first_name").value,
+                    last_name: document.getElementById("last_name").value,
+                    email: document.getElementById("email").value,
+                    phone: document.getElementById("phone").value,
+                    product_name: document.getElementById("product_name").value,
+                    ...extra,
+                };
+            }
+
+            function setResp(id, dotId, data, isError = false) {
+                document.getElementById(id).textContent = JSON.stringify(data, null, 2);
+                const dot = document.getElementById(dotId);
+                dot.className = "status-dot " + (isError ? "err" : "ok");
+            }
+
+            function setLoading(id, dotId) {
+                document.getElementById(id).textContent = "⏳ Loading...";
+                document.getElementById(dotId).className = "status-dot loading";
+            }
+
+            function showToast(msg, type = "") {
+                const t = document.getElementById("toast");
+                t.textContent = msg;
+                t.className = "show " + type;
+                setTimeout(() => (t.className = ""), 3000);
+            }
+
+            async function postJSON(url, body) {
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body),
+                });
+                return res.json();
+            }
+
+            // ── Core API generic charge ───────────────────────────────────────────────────
+
+            const panelMap = {
+                "bank-transfer/bca": ["pre-bt", "dot-bt"],
+                "bank-transfer/bni": ["pre-bt", "dot-bt"],
+                "bank-transfer/bri": ["pre-bt", "dot-bt"],
+                "bank-transfer/mandiri": ["pre-bt", "dot-bt"],
+                "bank-transfer/permata": ["pre-bt", "dot-bt"],
+                "bank-transfer/cimb": ["pre-bt", "dot-bt"],
+                "ewallet/gopay": ["pre-ew", "dot-ew"],
+                "ewallet/shopeepay": ["pre-ew", "dot-ew"],
+                "ewallet/dana": ["pre-ew", "dot-ew"],
+                "ewallet/ovo": ["pre-ew", "dot-ew"],
+                qris: ["pre-qris", "dot-qris"],
+                "cstore/indomaret": ["pre-cs", "dot-cs"],
+                "cstore/alfamart": ["pre-cs", "dot-cs"],
+                akulaku: ["pre-pl", "dot-pl"],
+                kredivo: ["pre-pl", "dot-pl"],
+                "uob-ezpay": ["pre-pl", "dot-pl"],
+                "credit-card": ["pre-cc", "dot-cc"],
+            };
+
+            async function charge(path, label) {
+                const [respId, dotId] = panelMap[path] || ["pre-bt", "dot-bt"];
+                setLoading(respId, dotId);
+                try {
+                    let extra = {};
+                    if (path === "credit-card") {
+                        extra.token_id = document.getElementById("token_id").value;
+                        const term = parseInt(document.getElementById("installment_term").value);
+                        if (term > 0) {
+                            extra.installment = true;
+                            extra.installment_term = term;
+                            extra.bank = document.getElementById("bank").value;
+                        }
+                    }
+                    if (path === "ewallet/ovo") {
+                        extra.ovo_phone = document.getElementById("ovo_phone").value;
+                    }
+                    const data = await postJSON(`/core/${path}`, getPayload(extra));
+                    setResp(respId, dotId, data, !data.success);
+                    showToast(
+                        data.success ? `✅ ${label} berhasil` : `❌ ${label} gagal`,
+                        data.success ? "success" : "error",
+                    );
+                } catch (e) {
+                    setResp(respId, dotId, { error: e.message }, true);
+                    showToast("❌ Network error", "error");
+                }
+            }
+
+            // ── Snap ─────────────────────────────────────────────────────────────────────
+
+            async function callSnap() {
+                setLoading("pre-snap", "dot-snap");
+                try {
+                    const data = await postJSON("/snap/create", getPayload());
+                    setResp("pre-snap", "dot-snap", data, !data.success);
+                    if (data.success && data.data && data.data.token) {
+                        window.snap.pay(data.data.token, {
+                            onSuccess: (r) => {
+                                showToast("✅ Pembayaran berhasil!", "success");
+                                console.log("snap:success", r);
+                            },
+                            onPending: (r) => {
+                                showToast("⏳ Menunggu pembayaran", "");
+                                console.log("snap:pending", r);
+                            },
+                            onError: (r) => {
+                                showToast("❌ Pembayaran gagal", "error");
+                                console.log("snap:error", r);
+                            },
+                            onClose: () => {
+                                showToast("ℹ️ Popup ditutup");
+                            },
+                        });
+                    } else {
+                        showToast("❌ Snap token tidak didapat", "error");
+                    }
+                } catch (e) {
+                    setResp("pre-snap", "dot-snap", { error: e.message }, true);
+                    showToast("❌ Network error", "error");
+                }
+            }
+
+            // ── CC & OVO toggles ─────────────────────────────────────────────────────────
+
+            function showCC() {
+                document.getElementById("cc-extra").classList.add("show");
+                document.getElementById("ovo-field").style.display = "none";
+                charge("credit-card", "credit-card");
+            }
+
+            function showOVO() {
+                document.getElementById("ovo-field").style.display = "block";
+                document.getElementById("cc-extra").classList.remove("show");
+                charge("ewallet/ovo", "ovo");
+            }
+
+            // ── Transaction Tools ─────────────────────────────────────────────────────────
+
+            async function checkStatus() {
+                const id = document.getElementById("order_id").value.trim();
+                if (!id) {
+                    showToast("⚠️ Isi Order ID dulu", "error");
+                    return;
+                }
+                setLoading("pre-tool", "dot-tool");
+                try {
+                    const res = await fetch(`/status/${id}`);
+                    const data = await res.json();
+                    setResp("pre-tool", "dot-tool", data, !data.success);
+                    showToast(
+                        data.success ? "✅ Status didapat" : "❌ Order tidak ditemukan",
+                        data.success ? "success" : "error",
+                    );
+                } catch (e) {
+                    setResp("pre-tool", "dot-tool", { error: e.message }, true);
+                }
+            }
+
+            async function cancelTx() {
+                const id = document.getElementById("order_id").value.trim();
+                if (!id) {
+                    showToast("⚠️ Isi Order ID dulu", "error");
+                    return;
+                }
+                if (!confirm(`Cancel transaksi ${id}?`)) return;
+                setLoading("pre-tool", "dot-tool");
+                try {
+                    const data = await postJSON(`/cancel/${id}`, {});
+                    setResp("pre-tool", "dot-tool", data, !data.success);
+                    showToast(
+                        data.success ? "✅ Transaksi dibatalkan" : "❌ Gagal cancel",
+                        data.success ? "success" : "error",
+                    );
+                } catch (e) {
+                    setResp("pre-tool", "dot-tool", { error: e.message }, true);
+                }
+            }
+        </script>
+    </body>
+</html>
