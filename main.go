@@ -4,12 +4,36 @@ import (
 	"log"
 	"midtrans-tester/config"
 	"midtrans-tester/handlers"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Create logs directory if it doesn't exist
+	if err := os.MkdirAll("logs", 0755); err != nil {
+		log.Fatalf("Failed to create logs directory: %v", err)
+	}
+
+	// Open or create log file
+	logFile, err := os.OpenFile("logs/dev.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("Failed to open log file: %v", err)
+	}
+	defer logFile.Close()
+
+	// Redirect standard logger
+	log.SetOutput(logFile)
+
+	// Redirect Gin logger
+	gin.DefaultWriter = logFile
+	gin.DefaultErrorWriter = logFile
+
+	// Redirect os.Stdout and os.Stderr
+	os.Stdout = logFile
+	os.Stderr = logFile
+
 	if err := godotenv.Load(); err != nil {
 		log.Println("Warning: .env file not found, reading from environment")
 	}

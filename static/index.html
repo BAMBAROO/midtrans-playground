@@ -244,6 +244,28 @@
                 }
             }
 
+            .copy-btn {
+                background: transparent;
+                border: 1px solid #334155;
+                color: #64748b;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.7rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-family: inherit;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                text-transform: none;
+                margin-left: auto;
+            }
+            .copy-btn:hover {
+                border-color: #38bdf8;
+                color: #38bdf8;
+                background: #0f2d47;
+            }
+
             /* Toast */
             #toast {
                 position: fixed;
@@ -373,7 +395,10 @@
                         dimuat otomatis dari response.
                     </p>
                     <div class="response-panel" id="resp-snap">
-                        <h4><span class="status-dot" id="dot-snap"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-snap"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-snap')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-snap">—</pre>
                     </div>
                 </div>
@@ -412,7 +437,10 @@
                         </button>
                     </div>
                     <div class="response-panel" id="resp-bt">
-                        <h4><span class="status-dot" id="dot-bt"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-bt"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-bt')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-bt">—</pre>
                     </div>
                 </div>
@@ -439,7 +467,10 @@
                         </button>
                     </div>
                     <div class="response-panel" id="resp-ew">
-                        <h4><span class="status-dot" id="dot-ew"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-ew"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-ew')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-ew">—</pre>
                     </div>
                 </div>
@@ -457,7 +488,10 @@
                         </button>
                     </div>
                     <div class="response-panel" id="resp-qris">
-                        <h4><span class="status-dot" id="dot-qris"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-qris"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-qris')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-qris">—</pre>
                     </div>
                 </div>
@@ -478,7 +512,10 @@
                         Isi Token ID (dari Midtrans.js) di form kiri sebelum charge.
                     </p>
                     <div class="response-panel" id="resp-cc">
-                        <h4><span class="status-dot" id="dot-cc"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-cc"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-cc')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-cc">—</pre>
                     </div>
                 </div>
@@ -499,7 +536,10 @@
                         </button>
                     </div>
                     <div class="response-panel" id="resp-cs">
-                        <h4><span class="status-dot" id="dot-cs"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-cs"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-cs')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-cs">—</pre>
                     </div>
                 </div>
@@ -523,7 +563,10 @@
                         </button>
                     </div>
                     <div class="response-panel" id="resp-pl">
-                        <h4><span class="status-dot" id="dot-pl"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-pl"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-pl')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-pl">—</pre>
                     </div>
                 </div>
@@ -543,7 +586,10 @@
                         </button>
                     </div>
                     <div class="response-panel" id="resp-tool">
-                        <h4><span class="status-dot" id="dot-tool"></span>Response</h4>
+                        <h4>
+                            <span class="status-dot" id="dot-tool"></span>Response
+                            <button class="copy-btn" onclick="copyResponse('pre-tool')">📋 Copy</button>
+                        </h4>
                         <pre id="pre-tool">—</pre>
                     </div>
                 </div>
@@ -584,6 +630,20 @@
                 t.textContent = msg;
                 t.className = "show " + type;
                 setTimeout(() => (t.className = ""), 3000);
+            }
+
+            async function copyResponse(preId) {
+                const text = document.getElementById(preId).textContent;
+                if (!text || text === "—" || text.includes("Loading...")) {
+                    showToast("⚠️ Tidak ada response untuk disalin", "error");
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(text);
+                    showToast("📋 Response disalin ke clipboard", "success");
+                } catch (e) {
+                    showToast("❌ Gagal menyalin response", "error");
+                }
             }
 
             async function postJSON(url, body) {
